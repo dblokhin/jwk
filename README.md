@@ -2,6 +2,7 @@
 Package provides easy and secure offline method to OAuth verify `id_token`.
 
 ## Lisense 
+MIT License
 
 ## Problem
 The `https://github.com/google/google-api-go-client` package doesn't provide the offline `verify()` for OAuth `id_token`, which is priority method than call api [https://www.googleapis.com/oauth2/v2/tokeninfo](https://www.googleapis.com/oauth2/v2/tokeninfo).
