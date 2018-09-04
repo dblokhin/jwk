@@ -27,22 +27,22 @@ var (
 type google struct{}
 
 // Iss provides valid iss list
-func (g google) Iss() []string {
+func (p google) Iss() []string {
 	return googleIss
 }
 
 // GetKeys provides google public jwk keys
-func (g google) GetKeys() (*oauth2.Jwk, error) {
+func (p google) GetKeys() (*oauth2.Jwk, error) {
 	var err error
-	googleCache, err = getGoogleKeys(googleCache)
+	googleCache, err = p.getPublicKeys(googleCache)
 
 	return googleCache, err
 }
 
 // GetKey provides google public jwk key by kid
-func (g google) GetKey(kid string) (*oauth2.JwkKeys, error) {
+func (p google) GetKey(kid string) (*oauth2.JwkKeys, error) {
 	var err error
-	googleCache, err = getGoogleKeys(googleCache)
+	googleCache, err = p.getPublicKeys(googleCache)
 	if err != nil {
 		return nil, err
 	}
@@ -56,9 +56,9 @@ func (g google) GetKey(kid string) (*oauth2.JwkKeys, error) {
 	return nil, errUnsupportedAlgorithm
 }
 
-func getGoogleKeys(cachedKeys *oauth2.Jwk) (*oauth2.Jwk, error) {
+func (p google) getPublicKeys(cachedKeys *oauth2.Jwk) (*oauth2.Jwk, error) {
 	if cachedKeys == nil {
-		return loadGoogleKeys()
+		return p.loadPublicKeys()
 	} else {
 		// check expired cachedKeys
 		expires, err := time.Parse(time.RFC1123, cachedKeys.Header.Get("expires"))
@@ -68,14 +68,14 @@ func getGoogleKeys(cachedKeys *oauth2.Jwk) (*oauth2.Jwk, error) {
 
 		if expires.Before(time.Now()) {
 			// return updated keys
-			return loadGoogleKeys()
+			return p.loadPublicKeys()
 		}
 
 		return cachedKeys, nil
 	}
 }
 
-func loadGoogleKeys() (*oauth2.Jwk, error) {
+func (p google) loadPublicKeys() (*oauth2.Jwk, error) {
 	client, err := oauth2.New(http.DefaultClient)
 	if err != nil {
 		return nil, err
